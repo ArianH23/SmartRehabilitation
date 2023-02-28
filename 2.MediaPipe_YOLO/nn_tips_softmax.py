@@ -11,6 +11,7 @@ import pandas as pd
 from collections.abc import Iterable
 from torch.utils.data import Dataset, DataLoader
 import itertools
+import tqdm
 
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -40,33 +41,37 @@ df = df.drop('col64', axis=1)
 le = preprocessing.LabelEncoder()
 le.fit(['none', 'power', 'precision'])
 
+batch_size = 32
 # Tips of the fingers positions
 #   |        X           |           Y          |            Z          |
 l = [0, 4, 8, 12, 16, 20, 21, 25, 29, 33, 37, 41]# 42, 46, 50, 54, 58, 62]
 
 df['col65'] = le.transform(df['col65'])
 
-X = df.iloc[:, l]
-y = df.iloc[:, -1]
+X = torch.tensor(df.iloc[:, l].values, dtype=torch.float32)
+y = torch.tensor(df.iloc[:, -1], dtype=torch.float32)
+
 X_train, X_val, y_train, y_val = train_test_split(X, y, test_size=0.15, random_state=42,shuffle=True )
 
 train_data = Data(np.array(X_train), np.array(y_train))
-train_dataloader = DataLoader(dataset=train_data, batch_size=32, shuffle=True)
+train_dataloader = DataLoader(dataset=train_data, batch_size=batch_size, shuffle=True)
 
 test_data = Data(np.array(X_val), np.array(y_val))
-test_dataloader = DataLoader(dataset=test_data, batch_size=32, shuffle=True)
+test_dataloader = DataLoader(dataset=test_data, batch_size=batch_size, shuffle=True)
 
 input_dim = 12
 hidden_dim_1 = 64
 hidden_dim_2 = 32
 output_dim = 3
+batches_per_epoch = len(X) 
+
 
 class Net(nn.Module):
     def __init__(self, input_dim, hidden_dim_1, hidden_dim_2, output_dim):
         super(Net, self).__init__()
         self.layer_1 = nn.Linear(input_dim, hidden_dim_1)
         self.layer_2 = nn.Linear(hidden_dim_1, hidden_dim_2)
-        self.layer_3 = nn.Linear(output_dim)
+        self.layer_3 = nn.Linear(hidden_dim_2,output_dim)
        
     def forward(self, x):
         x = torch.nn.functional.relu(self.layer_1(x))
@@ -81,7 +86,7 @@ learning_rate = 0.01
 
 loss_fn = nn.CrossEntropyLoss()
 
-optimizer = torch.optim.SGD(model.parameters(), lr=learning_rate)
+optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
 
 num_epochs = 50
@@ -89,17 +94,25 @@ loss_values = []
 
 
 for epoch in range(num_epochs):
-    for X, y in train_dataloader:
-        # zero the parameter gradients
-        optimizer.zero_grad()
-       
-        # forward + backward + optimize
-        pred = model(X)
-        loss = loss_fn(pred, y.unsqueeze(-1))
-        loss_values.append(loss.item())
-        loss.backward()
-        optimizer.step()
-        print(loss)
+    with tqdm.trange(batches_per_epoch, unit="batch", mininterval=0) as bar:
+        bar.set_description(f"Epoch {epoch}")
+        for i in bar:
+            # take a batch
+            start = i * batch_size
+            X_batch = X[start:start+batch_size]
+            y_batch = y[start:start+batch_size]
+            # forward pass
+
+            # X_val = torch.tensor(X_val.values).float()
+
+
+            y_pred = model(X_batch)
+            loss = loss_fn(y_pred, y_batch)
+            # backward pass
+            optimizer.zero_grad()
+            loss.backward()
+            # update weights
+            optimizer.step()
 
 
 print("Training Complete")
