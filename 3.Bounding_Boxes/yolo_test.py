@@ -13,7 +13,10 @@ path = 'runs/detect'
 list_dir = os.listdir(path)
 last_folder_number = 0
 
-bb_df = pd.DataFrame(columns=['col{}'.format(i) for i in range(1, 11)])
+bb_df = pd.DataFrame(columns=['hand_min_x','hand_min_y', 'hand_width', 'hand_length',
+                              'object_min_x','object_min_y', 'object_width', 'object_height'
+                              'picture_name', 'grasp'])
+
 
 model = YOLO("yolov8x6.pt")
 
