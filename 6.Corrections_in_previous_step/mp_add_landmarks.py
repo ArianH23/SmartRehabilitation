@@ -19,15 +19,15 @@ def normalize(arr, t_min, t_max):
     norm_arr.append(temp)
   return norm_arr
 
-mp_yolo_df = pd.read_csv('dataset_dist_to_min/MPandYOLO2Hands.csv')
-data_to_replace = pd.read_csv('dataset_dist_to_min/mp_bb_salad.csv')
+mp_yolo_df = pd.read_csv('data/simu_yolo.csv')
+# data_to_replace = pd.read_csv('dataset_dist_to_min/mp_bb_salad.csv')
 
-data_to_replace = data_to_replace.iloc[:, :8]
-print(data_to_replace)
+# data_to_replace = data_to_replace.iloc[:, :8]
+# print(data_to_replace)
 
-# Just doing a replace of values to avoid running the YOLO algorithm again
-for i in range(8):
-  mp_yolo_df.iloc[:, i] = data_to_replace.iloc[:,i]
+# # Just doing a replace of values to avoid running the YOLO algorithm again
+# for i in range(8):
+#   mp_yolo_df.iloc[:, i] = data_to_replace.iloc[:,i]
 
 
 l_names = []
@@ -98,7 +98,7 @@ with mp_hands.Hands(
 
     # print(index)
     
-    path_ini = 'frames_salad'
+    path_ini = '../../../Hand Position/frames_simulation_partial'
     name = row['picture_name']
     
     object_center_x = row['object_min_x'] +row['object_width'] // 2
@@ -320,4 +320,4 @@ with mp_hands.Hands(
     #       hand_world_landmarks, mp_hands.HAND_CONNECTIONS, azimuth=5)
       
 
-  df.to_csv('dataset_dist_to_min/MPandYOLOandLM_dist2Hands_corrections.csv', index=False)
+  df.to_csv('data/simu_yolo_lm.csv', index=False)

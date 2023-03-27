@@ -23,7 +23,7 @@ import seaborn as sns
 from captum.attr import LayerConductance, LayerActivation, LayerIntegratedGradients
 from captum.attr import IntegratedGradients, DeepLift, GradientShap, NoiseTunnel, FeatureAblation
 
-normalize = False
+normalize = True
 
 class Data(Dataset):
     def __init__(self, X, y):
@@ -38,6 +38,10 @@ class Data(Dataset):
         return self.len
 
 df = pd.read_csv('data/MPandYOLOandLM_dist2Hands_corrections.csv')
+df2 = pd.read_csv('data/simu_yolo_lm.csv')
+
+df = pd.concat([df,df2], ignore_index=True)
+
 df = df.drop('picture_name', axis=1)
 
 # le = preprocessing.LabelEncoder()
