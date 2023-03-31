@@ -213,7 +213,8 @@ classes = ('none', 'power', 'precision')
 
 # Build confusion matrix
 y_true = [np.argmax(i) for i in y_true]
-
+element_count = Counter(y_true)
+print(element_count)
 print('F1', f1_score(y_true, y_pred, average=None))
 print('F1-micro', f1_score(y_true, y_pred, average='micro'))
 print('F1-macro', f1_score(y_true, y_pred, average='macro'))
