@@ -19,7 +19,7 @@ def normalize(arr, t_min, t_max):
     norm_arr.append(temp)
   return norm_arr
 
-mp_yolo_df = pd.read_csv('data/salad_yolo.csv')
+mp_yolo_df = pd.read_csv('MPandYolo.csv')
 # data_to_replace = pd.read_csv('dataset_dist_to_min/mp_bb_salad.csv')
 
 # data_to_replace = data_to_replace.iloc[:, :8]
@@ -34,12 +34,10 @@ l_names = []
 n = 21  # number of coordinate pairs
 
 for i in range(1, n+1):
-  l_names.extend([f"l{i}x", f"l{i}y", f"l{i}z"])
+  l_names.extend([f"{i}x", f"{i}y", f"{i}z"])
 
-for i in range(1, n+1):
-  l_names.extend([f"r{i}x", f"r{i}y", f"r{i}z"])
 
-df = pd.DataFrame(columns=list(mp_yolo_df.columns[:-3]) + l_names + ['picture_name', 'grasp'])
+df = pd.DataFrame(columns=list(mp_yolo_df.columns[:-3]) + l_names + ['handedness','picture_name', 'grasp'])
 i = 0
 
 def furthest_point(x1, y1, x2, y2, width, height):
@@ -95,25 +93,26 @@ with mp_hands.Hands(
   for index, row in mp_yolo_df.iterrows():
     print(index+1,'/',mp_yolo_df.shape[0])
     grasp = row['grasp']
+    handedness = row['handedness']
     aux_row = list(row)[:-3]
 
     # print(index)
     
-    path_ini = '../../../Hand Position/frames_salad'
+    path_ini = 'EpicKitchenFrames/useful/'
     name = row['picture_name']
     
     object_center_x = row['object_min_x'] +row['object_width'] // 2
     object_center_y = row['object_min_y'] +row['object_height'] // 2
 
-    ext = ''
+    # ext = ''
 
-    if 'power' in grasp: ext = 'power'
-    elif 'precision' in grasp: ext = 'precision'
-    else: ext = 'none'
+    # if 'power' in grasp: ext = 'power'
+    # elif 'precision' in grasp: ext = 'precision'
+    # else: ext = 'none'
 
     # Read an image, flip it around y-axis for correct handedness output (see
     # above).
-    image_path = os.path.join(path_ini, ext, name)
+    image_path = os.path.join(path_ini, name)
     image = cv2.flip(cv2.imread(image_path), 1)
     # Convert the BGR image to RGB before processing.
     results = hands.process(cv2.cvtColor(image, cv2.COLOR_BGR2RGB))
@@ -130,86 +129,93 @@ with mp_hands.Hands(
     min_x = 1920
     min_y = 1920
 
-    landmarks_left = []
-    landmarks_right = []
+    landmarks = []
     
     for ind, hand_landmarks in enumerate(results.multi_hand_landmarks):
       
       label = results.multi_handedness[ind].classification[0].label
 
-      left_hand_exists = row['l_hand_width'] != 0
-      right_hand_exists = row['r_hand_width'] != 0
+      if label.lower() != handedness: continue
+
+      # left_hand_exists = row['l_hand_width'] != 0
+      # right_hand_exists = row['r_hand_width'] != 0
       
       # There is no object detection in the image
       if row['object_width'] == 0:
         
         # Furthest corner value
-        furthest_x_l = None
-        furthest_y_l = None
+        # furthest_x_l = None
+        # furthest_y_l = None
         
-        furthest_x_r = None
-        furthest_y_r = None
+        # furthest_x_r = None
+        # furthest_y_r = None
 
-        if left_hand_exists and not right_hand_exists:
-          l_center_x = row['l_hand_min_x'] + row['l_hand_width']//2
-          l_center_y = row['l_hand_min_y'] + row['l_hand_height']//2
+        # if left_hand_exists and not right_hand_exists:
+        #   l_center_x = row['l_hand_min_x'] + row['l_hand_width']//2
+        #   l_center_y = row['l_hand_min_y'] + row['l_hand_height']//2
           
-          # We set the object the furthest away from the hand, AKA the furthest corner
-          if l_center_x < 1920//2: furthest_x_l = 1920
-          else : furthest_x_l = 0
+        #   # We set the object the furthest away from the hand, AKA the furthest corner
+        #   if l_center_x < 1920//2: furthest_x_l = 1920
+        #   else : furthest_x_l = 0
 
-          if l_center_y < 1080//2: furthest_y_l = 1080
-          else : furthest_y_l = 0
+        #   if l_center_y < 1080//2: furthest_y_l = 1080
+        #   else : furthest_y_l = 0
 
-          object_center_x = furthest_x_l
-          object_center_y = furthest_y_l
+        #   object_center_x = furthest_x_l
+        #   object_center_y = furthest_y_l
 
-          aux_row[8] = object_center_x
-          aux_row[9] = object_center_y
+        #   aux_row[8] = object_center_x
+        #   aux_row[9] = object_center_y
+
+        #   # And set the opposite phantom hand in the opposite corner
+        #   aux_row[4] = 1920-furthest_x_l
+        #   aux_row[5] = 1080-furthest_y_l
+          
+
+        # if right_hand_exists and not left_hand_exists:
+        #   r_center_x = row['r_hand_min_x'] + row['r_hand_width']//2
+        #   r_center_y = row['r_hand_min_y'] + row['r_hand_height']//2
+
+        #   # We set the object the furthest away from the hand, AKA the furthest corner
+        #   if r_center_x < 1920//2: furthest_x_r = 1920
+        #   else : furthest_x_r = 0
+
+        #   if r_center_y < 1080//2: furthest_y_r = 1080
+        #   else : furthest_y_r = 0
+
+        #   object_center_x = furthest_x_r
+        #   object_center_y = furthest_y_r
+
+        #   aux_row[8] = object_center_x
+        #   aux_row[9] = object_center_y
 
           # And set the opposite phantom hand in the opposite corner
-          aux_row[4] = 1920-furthest_x_l
-          aux_row[5] = 1080-furthest_y_l
-          
+          # aux_row[0] = 1920-furthest_x_r
+          # aux_row[1] = 1080-furthest_y_r
 
-        if right_hand_exists and not left_hand_exists:
-          r_center_x = row['r_hand_min_x'] + row['r_hand_width']//2
-          r_center_y = row['r_hand_min_y'] + row['r_hand_height']//2
+        center_x = row['hand_min_x'] + row['hand_width']//2
+        center_y = row['hand_min_y'] + row['hand_height']//2
 
-          # We set the object the furthest away from the hand, AKA the furthest corner
-          if r_center_x < 1920//2: furthest_x_r = 1920
-          else : furthest_x_r = 0
+        # r_center_x = row['r_hand_min_x'] + row['r_hand_width']//2
+        # r_center_y = row['r_hand_min_y'] + row['r_hand_height']//2
 
-          if r_center_y < 1080//2: furthest_y_r = 1080
-          else : furthest_y_r = 0
+        # The furthest point is defined as following:
+        # From the 2 distances that appear when a point is selected using the center of the 2 hands,
+        # The point returned in this function has the maximum minimum distance between both distances.
+        if center_x < 1920//2: furthest_x = 1920
+        else : furthest_x = 0
 
-          object_center_x = furthest_x_r
-          object_center_y = furthest_y_r
+        if center_y < 1080//2: furthest_y = 1080
+        else : furthest_y = 0
 
-          aux_row[8] = object_center_x
-          aux_row[9] = object_center_y
+        
+        # furthest_x, furthest_y = furthest_point(l_center_x, l_center_y, r_center_x, r_center_y, image_width, image_height)
 
-          # And set the opposite phantom hand in the opposite corner
-          aux_row[0] = 1920-furthest_x_r
-          aux_row[1] = 1080-furthest_y_r
+        object_center_x = furthest_x
+        object_center_y = furthest_y
 
-        if left_hand_exists and right_hand_exists:
-          l_center_x = row['l_hand_min_x'] + row['l_hand_width']//2
-          l_center_y = row['l_hand_min_y'] + row['l_hand_height']//2
-
-          r_center_x = row['r_hand_min_x'] + row['r_hand_width']//2
-          r_center_y = row['r_hand_min_y'] + row['r_hand_height']//2
-
-          # The furthest point is defined as following:
-          # From the 2 distances that appear when a point is selected using the center of the 2 hands,
-          # The point returned in this function has the maximum minimum distance between both distances.
-          furthest_x, furthest_y = furthest_point(l_center_x, l_center_y, r_center_x, r_center_y, image_width, image_height)
-
-          object_center_x = furthest_x
-          object_center_y = furthest_y
-
-          aux_row[8] = object_center_x
-          aux_row[9] = object_center_y
+        aux_row[4] = object_center_x
+        aux_row[5] = object_center_y
 
       
       for mark in hand_landmarks.landmark:
@@ -230,11 +236,8 @@ with mp_hands.Hands(
         # else:
         #   dist_x, dist_y = 0, 0
         
-        if label == 'Left'and len(landmarks_left)<63:
-          landmarks_left.extend([dist_x, dist_y, z_val])
+        landmarks.extend([dist_x, dist_y, z_val])
 
-        if label == 'Right' and len(landmarks_right)<63:
-          landmarks_right.extend([dist_x, dist_y, z_val])
 
     # if landmarks_left == []: 
     #   if object_center_x < 1920//2: furthest_x_l = 1920
@@ -290,6 +293,7 @@ with mp_hands.Hands(
 
     # print(len(aux_row))
     # print(df.columns)
+    # print(aux_row)
     df.loc[len(df)] = aux_row
 
     print(df)
@@ -325,4 +329,4 @@ with mp_hands.Hands(
     #       hand_world_landmarks, mp_hands.HAND_CONNECTIONS, azimuth=5)
       
 
-  df.to_csv('data/salad_yolo_lm_and_z.csv', index=False)
+  df.to_csv('MPandYOLOandLM_dist2Hands_correctionsZ.csv', index=False)
