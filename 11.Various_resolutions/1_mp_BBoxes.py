@@ -26,7 +26,7 @@ c = ['hand_min_x','hand_min_y','hand_width','hand_height','handedness','picture_
 df = pd.DataFrame(columns=c)
 i = 0
 
-possible_folders = ['256', 'AFP300', 'AFC300', 'original', 'AFP640', 'padded']
+possible_folders = ['256', 'AFP300', 'AFC300', 'original', 'AFP640', 'AFP1920']
 pos_i = 0
 
 count_ori = 0
@@ -150,7 +150,7 @@ with mp_hands.Hands(
           x_val = mark.x
           y_val = mark.y
 
-          if 'AFC300' in image_path:
+          if 'AFC' in image_path:
             if x_val * 1080 + 420 > max_x: max_x = x_val * 1080 + 420
             if x_val * 1080 + 420 < min_x: min_x = x_val * 1080 + 420
 
@@ -159,13 +159,13 @@ with mp_hands.Hands(
             if x_val * image_width < min_x: min_x = x_val * image_width
 
           # Due to the original resolution with padding 
-          if image.shape[0] == 1920:
+          if 'AFP' in image_path:
             if y_val * 1920 - 420 > max_y: max_y = y_val * 1920 - 420
             if y_val * 1920 - 420 < min_y: min_y = y_val * 1920 - 420
 
-          elif image.shape[0] == 640:
-            if y_val * 640 + 220 > max_y: max_y = y_val * 640 + 220
-            if y_val * 640 + 220 < min_y: min_y = y_val * 640 + 220
+          # elif image.shape[0] == 640:
+          #   if y_val * 640 + 220 > max_y: max_y = y_val * 640 + 220
+          #   if y_val * 640 + 220 < min_y: min_y = y_val * 640 + 220
           
           else:
             if y_val * image_height > max_y: max_y = y_val * image_height
@@ -284,7 +284,7 @@ with mp_hands.Hands(
       print('Detections in 300AfC resolution:', count_AFC300)
       print('Detections in original 1920x1080 resolution:', count_ori)
       print('Detections in 640AfP resolution:', count_AFP640)
-      print('Detections in padded original 1920x1080 resolution:', count_pad)
+      print('Detections in 1920Afp resolution:', count_pad)
       print('No detections:', no_detection)
       # print(len(hc_x_norm), len(res_x))
       
