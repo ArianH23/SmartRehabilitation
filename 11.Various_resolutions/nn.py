@@ -39,7 +39,7 @@ class Data(Dataset):
     def __len__(self):
         return self.len
 
-df = pd.read_csv('data/no_df.csv')
+df = pd.read_csv('data/df_final.csv')
 
 ####################### df = df.drop('picture_name', axis=1)
 
