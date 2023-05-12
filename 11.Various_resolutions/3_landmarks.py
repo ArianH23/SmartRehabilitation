@@ -86,13 +86,12 @@ def furthest_point(x1, y1, x2, y2, width, height):
   
   return furthest_point
 
-possible_folders = ['256', 'AFP300', 'AFC300', 'original', 'AFP640', 'AFP1920']
+possible_folders = ['256', 'AFP300', 'AFC300', 'original', 'AFP1920']
 
 count_ori = 0
 count_256 = 0
 count_AFP300 = 0
 count_AFC300 = 0
-count_AFP640 = 0
 count_pad = 0
 no_detection = 0
 
@@ -113,9 +112,12 @@ with mp_hands.Hands(
     
     object_center_x = row['object_min_x'] +row['object_width'] // 2
     object_center_y = row['object_min_y'] +row['object_height'] // 2
+    
+    annotated_image = cv2.imread('EpicKitchen/original/'+name)
+    
+    have_results = False
 
     for fold in possible_folders:
-
       image_path = os.path.join('EpicKitchen', fold, name)
       image = cv2.flip(cv2.imread(image_path), 1)
       # Convert the BGR image to RGB before processing.
@@ -134,7 +136,6 @@ with mp_hands.Hands(
           elif fold == 'AFP300': count_AFP300 += 1
           elif fold == 'AFC300': count_AFC300 += 1
           elif fold == 'original': count_ori += 1
-          elif fold == 'AFC640': count_AFP640 += 1
           else: count_pad += 1
           break
         
@@ -149,7 +150,6 @@ with mp_hands.Hands(
               elif fold == 'AFP300': count_AFP300 += 1
               elif fold == 'AFC300': count_AFC300 += 1
               elif fold == 'original': count_ori += 1
-              elif fold == 'AFC640': count_AFP640 += 1
               else: count_pad += 1
               break
       
@@ -207,15 +207,18 @@ with mp_hands.Hands(
 
         if 'AFC' in image_path:
           x_val = mark.x * 1080 + 420
+          
         else:
           x_val = mark.x * 1920
+        # Because the image is flipped
+        x_val = 1920 - x_val
 
       # Due to the original resolution with padding 
         if 'AFP' in image_path:
           y_val = mark.y * 1920 - 420
         else:
           y_val = mark.y * 1080
-
+        # print(mark.x, x_val, fold)
         x_val = int(round(x_val))
         y_val = int(round(y_val))
 
@@ -239,15 +242,22 @@ with mp_hands.Hands(
 
       if len(aux_row) == 74:
         df.loc[len(df)] = aux_row
-
+    
+    
     print(df)
+    annotated_image = cv2.rectangle(annotated_image, (row['hand_min_x'], row['hand_min_y']), (row['hand_min_x'] + row['hand_width'], row['hand_min_y']+ row['hand_height']), (255,0,255), 3)
+    annotated_image = cv2.rectangle(annotated_image, (row['object_min_x'], row['object_min_y']), (row['object_min_x'] +row['object_width'], row['object_min_y'] +row['object_height']), (255,255,0), 3)
+    for i in range(1,22):
+      annotated_image = cv2.line(annotated_image, (object_center_x-df.loc[len(df)-1, f'{i}x'], object_center_y-df.loc[len(df)-1, f'{i}y']), (object_center_x, object_center_y), (0,255,0), 2)
+  
+    # cv2.imwrite('randomLM/'+ name[:-4] + '.png', annotated_image)
+
     print('Detections in 256 resolution:', count_256)
     print('Detections in 300AfP resolution:', count_AFP300)
     print('Detections in 300AfC resolution:', count_AFC300)
     print('Detections in original 1920x1080 resolution:', count_ori)
-    print('Detections in 640AfP resolution:', count_AFP640)
     print('Detections in 1920Afp resolution:', count_pad)
     print('No detections:', no_detection)
-      
+    # 1/0
 
-  df.to_csv('EKMPYOLOLM.csv', index=False)
+  df.to_csv('EKMPOLDYOLOLMCorrect.csv', index=False)

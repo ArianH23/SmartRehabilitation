@@ -84,7 +84,7 @@ y = df.iloc[:, -1:]
 # y = np.array(df).reshape(-1, 1)
 X = pd.get_dummies(X, columns=['handedness'])
 # print(X)
-# print(y.value_counts())
+print(y.value_counts())
 
 
 # print(y)
