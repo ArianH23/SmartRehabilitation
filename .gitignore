@@ -143,3 +143,6 @@ dmypy.json
 *.pfm
 *.csv
 !tests/fixtures/*.csv
+
+# Thesis report (54 MB) is kept locally only
+/docs/thesis.pdf
