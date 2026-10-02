@@ -21,8 +21,8 @@ def test_read_pfm_round_trip(tmp_path):
 
 def test_depth_difference_is_object_minus_hand_median():
     depth = np.zeros((100, 200))
-    depth[10:30, 10:30] = 5.0      # hand region
-    depth[50:70, 100:120] = 8.0    # object region
+    depth[10:30, 10:30] = 5.0
+    depth[50:70, 100:120] = 8.0
     assert depth_difference(depth, (10, 10, 20, 20), (100, 50, 20, 20), 200, 100) == 3.0
 
 

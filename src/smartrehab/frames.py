@@ -19,8 +19,8 @@ GRASPS = ("none", "precision", "power")
 @dataclass
 class Frame:
     name: str                         # value written to the `picture_name` column
-    path: str                         # where the frame itself lives
-    grasp: str                        # "power", "precision" or "none"
+    path: str
+    grasp: str
     hand_hint: Optional[str]          # text the expected hand label is looked up in (None: right hands only)
 
 

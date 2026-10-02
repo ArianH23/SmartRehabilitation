@@ -18,7 +18,6 @@ def test_train_and_evaluate_smoke(tmp_path):
     cfg = TrainConfig(data_csv=str(csv), output_dir=str(tmp_path / "out"), epochs=2)
     checkpoint = train(cfg)
 
-    # Windows-safe checkpoint name, report artefacts written
     assert checkpoint.exists() and ":" not in checkpoint.name
     for name in ("validation_results_sorted.csv", "confusion_matrix_percent.png", "confusion_matrix_counts.png"):
         assert (tmp_path / "out" / name).exists()

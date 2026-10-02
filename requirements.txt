@@ -1,11 +1,5 @@
-# Runtime dependencies of the smartrehab package (same list as `dependencies` in pyproject.toml;
-# tests/test_requirements.py fails if the two diverge).
-#
-#   pip install -r requirements.txt     # libraries only
-#   pip install -e . --no-deps          # then the package itself (or just `pip install -e .` for both)
-#
-# To run the tests also install pytest. For the exact versions the thesis code was last tested with,
-# see requirements-lock.txt.
+# Runtime dependencies; keep in sync with pyproject.toml (tests/test_requirements.py checks).
+# Exact tested versions: requirements-lock.txt. The package itself: pip install -e . --no-deps
 numpy
 pandas
 opencv-python

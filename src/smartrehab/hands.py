@@ -24,9 +24,6 @@ log = logging.getLogger(__name__)
 HAND_BOX_COLUMNS = ["hand_min_x", "hand_min_y", "hand_width", "hand_height", "handedness", "picture_name", "grasp"]
 
 
-# --------------------------------------------------------------------------------------------------------------
-# Geometry (pure functions)
-# --------------------------------------------------------------------------------------------------------------
 def to_frame_pixels(xs, ys, kind: str, width: int, height: int):
     """Map landmarks normalised to a resolution variant onto pixels of the original (still mirrored) frame.
 
@@ -61,7 +58,7 @@ def hand_bbox(xs, ys, kind: str, width: int, height: int) -> list[int]:
 def landmark_features(xs, ys, zs, kind: str, width: int, height: int, object_center) -> list:
     """Per-landmark ``(object_x - x, object_y - y, z)`` triplets, flattened (63 values for 21 landmarks)."""
     px, py = to_frame_pixels(xs, ys, kind, width, height)
-    px = width - px                       # undo the mirroring
+    px = width - px
     features: list = []
     for x, y, z in zip(px, py, zs):
         features.extend([object_center[0] - int(round(x)), object_center[1] - int(round(y)), z])
@@ -75,9 +72,6 @@ def phantom_object_center(hand_box, width: int, height: int) -> tuple[int, int]:
     return (width if center_x < width // 2 else 0), (height if center_y < height // 2 else 0)
 
 
-# --------------------------------------------------------------------------------------------------------------
-# MediaPipe plumbing
-# --------------------------------------------------------------------------------------------------------------
 def open_hands(min_detection_confidence: float):
     import mediapipe as mp  # imported lazily so the geometry above works without MediaPipe installed
 
@@ -105,9 +99,6 @@ def find_hand(hands, candidates: Iterable[tuple[Variant, Optional[str]]], matche
     return None
 
 
-# --------------------------------------------------------------------------------------------------------------
-# Step 1: hand bounding boxes
-# --------------------------------------------------------------------------------------------------------------
 def _hand_matcher(frame: Frame) -> Callable[[str], bool]:
     if frame.hand_hint is None:           # right_only datasets (Yale)
         return lambda label: label == "right"
@@ -149,9 +140,6 @@ def detect_hand_boxes(cfg: DatasetConfig, debug_dir: Optional[str] = None) -> pd
     return pd.DataFrame(rows, columns=HAND_BOX_COLUMNS)
 
 
-# --------------------------------------------------------------------------------------------------------------
-# Step 3: landmark features
-# --------------------------------------------------------------------------------------------------------------
 def add_landmarks(cfg: DatasetConfig, mp_yolo: pd.DataFrame, debug_dir: Optional[str] = None) -> pd.DataFrame:
     """Step 3: append per-landmark distance to the object (plus MediaPipe's z) for each hand/object row.
 
@@ -176,7 +164,7 @@ def add_landmarks(cfg: DatasetConfig, mp_yolo: pd.DataFrame, debug_dir: Optional
 
             hand_box = [row[c] for c in HAND_BOX]
             object_box = [row[c] for c in OBJECT_BOX]
-            if object_box[2] == 0:        # no object: use the imaginary one
+            if object_box[2] == 0:
                 object_center = phantom_object_center(hand_box, cfg.width, cfg.height)
                 object_box[0], object_box[1] = object_center
             else:

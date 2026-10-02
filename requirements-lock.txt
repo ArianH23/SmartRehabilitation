@@ -1,12 +1,6 @@
-# Exact versions of every package in the environment the code was last tested in
-# (Python 3.11.7, Windows 11, CPU-only; generated with `pip freeze --exclude-editable`).
-#
-#   pip install -r requirements-lock.txt
-#   pip install -e . --no-deps
-#
-# Use requirements.txt for a normal install. Use this file only to reproduce the tested environment;
-# on another OS or on a GPU machine, install torch / torchvision for your platform first
-# (https://pytorch.org/get-started/locally/) and drop those two lines. colorama is Windows-only.
+# Exact versions of the tested environment (Python 3.11, Windows, CPU torch; pip freeze).
+# On another OS or a GPU machine install torch / torchvision for your platform first and drop those lines;
+# colorama is Windows-only. For a normal install use requirements.txt.
 absl-py==2.5.0
 anyio==4.15.1
 attrs==26.1.0
