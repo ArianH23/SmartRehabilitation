@@ -79,6 +79,12 @@ pytest                            # unit tests, no data needed
 
 `mediapipe` is pinned below 0.10.22 because the pipeline uses the legacy `mediapipe.solutions.hands` API.
 
+Dependency files:
+
+* `pyproject.toml`: the source of truth, used by `pip install -e ".[dev]"`.
+* `requirements.txt`: the same runtime list as a plain file (`pip install -r requirements.txt`, then `pip install -e . --no-deps` for the package itself); a test keeps it in sync with `pyproject.toml`.
+* `requirements-lock.txt`: exact versions of the environment the code was last tested in (Python 3.11, Windows, CPU torch). Only needed to reproduce that environment; see the header of the file.
+
 Not included in the repository (you provide them):
 
 * **Frames** of the datasets (see below).
