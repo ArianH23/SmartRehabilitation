@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=64"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "smartrehab"
+version = "1.0.0"
+description = "Precision and power grip detection in egocentric hand-object interaction (master's thesis, UPC / HEIG-VD)"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = [
+    "numpy",
+    "pandas",
+    "opencv-python",
+    "pyyaml",
+    "tqdm",
+    # Hand detection. The pipeline uses the legacy `mediapipe.solutions.hands` API.
+    "mediapipe>=0.10,<0.10.22",
+    # Object detection (YOLOv8).
+    "ultralytics",
+    # Grasp classifier.
+    "torch",
+    "scikit-learn>=1.2",
+    "seaborn",
+    "matplotlib",
+    "tensorboard",
+]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+
+[project.scripts]
+smartrehab = "smartrehab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

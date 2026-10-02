@@ -1,0 +1,13 @@
+# Hyper-parameters of the grasp classifier (values used in the thesis, chapter 5).
+data_csv: outputs/combined.csv     # produced by `smartrehab combine`
+output_dir: outputs/training
+
+seed: 42
+test_size: 0.15                    # validation share of the combined dataset
+epochs: 15
+batch_size: 32
+learning_rate: 0.01
+hidden_dims: [64, 32]
+dropout: 0.2
+# Cross-entropy class weights, in the order none / power / precision.
+class_weights: [0.6382, 0.64986, 0.71198]

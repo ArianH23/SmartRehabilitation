@@ -1,0 +1,36 @@
+# Yale human grasping dataset (640x480 head-mounted videos). Only right hands are annotated.
+#
+# `frames.csv` lists the frames; `filename_column` holds the (relative) image path and
+# `category_column` the Yale grasp type, which is mapped to power / precision / none by keyword.
+name: yale
+
+frame_size: {width: 640, height: 480}
+
+frames:
+  kind: csv
+  csv: ../data/yale_hand_labels2_adapted.csv
+  filename_column: Filename
+  category_column: SmallCategories
+  handedness_from: right_only
+
+hands:
+  min_detection_confidence: 0.15
+  pick: first
+  variants:
+    - {name: original, kind: plain, dir: null}
+
+objects:
+  weights: yolov8x6.pt
+  device: null
+  conf: 0.15
+  # 23 COCO classes that Levenshtein matching found in common with the Yale object list
+  classes: [13, 65, 74, 79, 39, 43, 70, 45, 59, 73, 44, 64, 75, 32, 35, 24, 41, 67, 56, 60, 2, 61, 71]
+  image_dir: null
+
+landmarks:
+  variants: null
+
+depth:
+  dir: ../midas_out
+  suffix: -dpt_beit_large_512.pfm
+  strip_prefix_chars: 16

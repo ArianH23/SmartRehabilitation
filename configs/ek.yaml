@@ -1,0 +1,41 @@
+# EpicKitchen frames (egocentric kitchen videos, labelled with MATLAB Video Labeler).
+#
+# Expected layout: the grasp class and the hand are encoded in the directory of each frame, e.g.
+#   EpicKitchen/data/<left|right>/<power|precision|none>/frame_0001.jpg
+# and the same frame name exists in every resolution variant directory below.
+name: ek
+
+frame_size: {width: 1920, height: 1080}
+
+frames:
+  kind: walk
+  root: EpicKitchen/data
+  handedness_from: path          # the expected hand ("left"/"right") is looked up in the directory path
+
+hands:
+  min_detection_confidence: 0.25
+  pick: last                     # when several detected hands match, the last one provides the box
+  # Resolution variants, tried in order until MediaPipe finds the expected hand.
+  #   plain: frame resized      pad: frame padded to a square      crop: centre crop
+  variants:
+    - {name: original, kind: plain, dir: EpicKitchen/original}
+    - {name: AFP1920,  kind: pad,   dir: EpicKitchen/AFP1920}
+    - {name: "256",    kind: plain, dir: EpicKitchen/256}
+    - {name: AFP300,   kind: pad,   dir: EpicKitchen/AFP300}
+    - {name: AFC300,   kind: crop,  dir: EpicKitchen/AFC300}
+
+objects:
+  weights: yolov8x6.pt
+  device: null                   # e.g. 0 for the first GPU; null lets Ultralytics choose
+  conf: null                     # null = Ultralytics default
+  # COCO classes: bottle, cup, fork, knife, banana, apple, mouse, remote, cell phone, scissors
+  classes: [39, 41, 42, 43, 46, 47, 64, 65, 67, 76]
+  image_dir: EpicKitchen/original
+
+landmarks:
+  variants: null                 # null = reuse hands.variants
+
+depth:
+  dir: EpicKitchenFrames/midas_out   # MiDaS DPT-BEiT-L-512 output, run outside this repo
+  suffix: -dpt_beit_large_512.pfm
+  strip_prefix_chars: 0

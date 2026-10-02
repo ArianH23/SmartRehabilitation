@@ -127,3 +127,19 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# --- SmartRehabilitation ---
+.idea/
+.vscode/
+.venv/
+
+# Raw data, pipeline outputs and trained artifacts are not versioned
+/data/
+/outputs/
+/runs/
+/models/
+*.pt
+*.pth
+*.pfm
+*.csv
+!tests/fixtures/*.csv
