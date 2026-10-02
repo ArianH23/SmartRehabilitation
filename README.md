@@ -2,8 +2,7 @@
 
 Code of the master's thesis *Precision and Power Grip Detection in Egocentric Hand-Object Interaction Using
 Machine Learning* (Rodrigo Arian Huapaya Sierra, Master in Data Science, UPC-FIB; carried out at HEIG-VD and CHUV,
-Switzerland). The full report is not versioned here (54 MB); a local copy can be kept at `docs/thesis.pdf`
-(git-ignored). <!-- TODO: add the public link to the report (e.g. UPCommons) -->.
+Switzerland). The full report is available at <https://hdl.handle.net/2117/394369>.
 
 Given a frame recorded from the user's point of view, the system decides whether the hand is performing a
 **power** grip, a **precision** grip, or **no** grasp. It is meant to support the evaluation of patients in upper
@@ -54,7 +53,7 @@ src/smartrehab/     the package
   cli.py              command line interface
 notebooks/          evaluation notebook
 tests/              unit tests (synthetic data only)
-docs/               sample images (and a local, git-ignored copy of the thesis PDF)
+docs/               sample images
 ```
 
 The iterations that led to this pipeline (simple CNN + Grad-CAM, MediaPipe + YOLO bounding boxes, landmarks, depth,
